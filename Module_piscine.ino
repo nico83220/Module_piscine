@@ -23,7 +23,6 @@
 // LiquidCrystal I2C
 // RTCLib
 // EmonLib
-// NTPClientLib
 //
 
 
@@ -126,11 +125,10 @@ PeristalticPump chlorinePump(Utils::GetStringFromDict(CHLORINE_PUMP), &chlorineP
 // GESTION ECRAN
 // -------------------------------------------------------------------------------------
 
-#define  TEMPERATURE_PH_AND_ORP_VALUES  0
-
+#define  TEMPERATURE_PH_AND_ORP_VALUES  1
 
 // Fonction d'affichage 1 :
-// pH ORP, température eau, air, huidité air, pression filtre, temps de filtration
+// pH, ORP, température eau, air, huidité air, pression filtre, temps de filtration
 void DisplayFunction1(bool displayMask)
 {
   // S'il faut afficher le masque
@@ -150,6 +148,57 @@ void DisplayFunction1(bool displayMask)
 
   value    = orpSensor.GetORP();
   strValue = Utils::Float2String(value, 0);
+  LCDDisplay.Print(3, 1, strValue.c_str());
+
+  value    = waterTemperatureSensor.GetTemperature();
+  strValue = Utils::Float2String(value, 1);
+  LCDDisplay.Print(2, 2, strValue.c_str());
+
+  value    = roomTemperatureAndHumiditySensor.GetTemperature();
+  strValue = Utils::Float2String(value, 0);
+  LCDDisplay.Print(11, 2, strValue.c_str());
+
+  value    = roomTemperatureAndHumiditySensor.GetHumidity();
+  strValue = Utils::Float2String(value, 0);
+  LCDDisplay.Print(17, 2, strValue.c_str());
+
+  value    = filterPressureSensor.GetPressure();
+  strValue = Utils::Float2String(value, 1);
+  LCDDisplay.Print(3, 3, strValue.c_str());
+}
+
+
+#define  TEMPERATURE_PH_AND_TIME  2
+
+// Fonction d'affichage 2 :
+// pH, température eau, heure
+void DisplayFunction2(bool displayMask)
+{
+  // S'il faut afficher le masque
+  if ( displayMask == true )
+  {
+    LCDDisplay.Print(0, 0, "  /  /          :  ");
+    LCDDisplay.Print(0, 1, "pH:            (   )");
+    LCDDisplay.Print(0, 2, "E:    C  A:    C   %");
+    LCDDisplay.Print(0, 3, "P:    b             ");
+  }
+
+  // Affichage des valeur
+
+  DateTime dtNow  = TimeManager.Now();
+  String strValue = Utils::Int2String((int) dtNow.day(), 2, ' ');
+  LCDDisplay.Print(0, 0, strValue.c_str());
+  strValue = Utils::Int2String((int) dtNow.month(), 2, '0');
+  LCDDisplay.Print(3, 0, strValue.c_str());
+  strValue = Utils::Int2String((int) dtNow.year(), 4, '0');
+  LCDDisplay.Print(6, 0, strValue.c_str());
+  strValue = Utils::Int2String((int) dtNow.hour(), 2, '0');
+  LCDDisplay.Print(15, 0, strValue.c_str());
+  strValue = Utils::Int2String((int) dtNow.minute(), 2, '0');
+  LCDDisplay.Print(18, 0, strValue.c_str());
+
+  float value = phSensor.GetPH();
+  strValue = Utils::Float2String(value, 1);
   LCDDisplay.Print(3, 1, strValue.c_str());
 
   value    = waterTemperatureSensor.GetTemperature();
@@ -398,6 +447,7 @@ void setup()
   
   LCDDisplay.RegisterDisplayMode(TEMPERATURE_PH_AND_ORP_VALUES, new DisplayMode(&DisplayFunction1, 5000));
   LCDDisplay.SetCurrentDisplayMode(TEMPERATURE_PH_AND_ORP_VALUES);
+  LCDDisplay.RegisterDisplayMode(TEMPERATURE_PH_AND_TIME, new DisplayMode(&DisplayFunction2, 5000));
   
   LOG_NEW_LINE;
 

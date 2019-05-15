@@ -1,6 +1,7 @@
 #ifndef __TIME_MANAGER_H__
 #define __TIME_MANAGER_H__
 
+#include <Arduino.h>
 #include <RTClib.h>
 
 
@@ -13,14 +14,16 @@ class TimeManagerClass
 private:
 
 protected:
-  RTC_DS3231  m_RTC;                     // Horloge RTC
-  bool        m_RTC_OK;                  // Flag indiquant que l'horloge RTC est OK
+  DS3231      m_RTC;                     // Horloge RTC
   uint32_t    m_timezoneOffsetInSecond;  // Décalage horaire
   
 public:
   // Initialisation
   void Initialize();
 
+  // Lire la date et heure actuelle
+  DateTime Now();
+  
   // Log de la date et l'heure de l'ARDUINO
   void LogDateTime() const;
   

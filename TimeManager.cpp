@@ -2,7 +2,7 @@
 #include "Utils.h"
 #include "LogConsole.h"
 
-#include <TimeLib.h>
+//#include <TimeLib.h>
 #include <NTPClient.h>
 
 
@@ -12,23 +12,29 @@
 void TimeManagerClass::Initialize()
 {
   // Initialisation de l'horloge RTC
-  m_RTC_OK = m_RTC.begin();
-  if ( m_RTC_OK == false )
-  {
-    LOG_MESSAGE(F("Impossible de trouver l'horloge RTC\n"));
-  }
+  m_RTC.begin();
 
-  else
-  {
-    DateTime dtNow = m_RTC.now();
-    setTime((int) dtNow.hour(), (int) dtNow.minute(), (int) dtNow.second(),
-            (int) dtNow.day(), (int) dtNow.month(), (int) dtNow.year());     
-    LogDateTime();
-  }
+/*
+  DateTime dtNow = m_RTC.now();
+  setTime((int) dtNow.hour(), (int) dtNow.minute(), (int) dtNow.second(),
+          (int) dtNow.day(), (int) dtNow.month(), (int) dtNow.year());
+*/
+  LogDateTime();
 
   // Décalage horaire de 2 heures par défaut
   m_timezoneOffsetInSecond = 2L * 3600L;
 }
+
+
+/*
+  Lire la date et heure actuelle
+*/
+DateTime TimeManagerClass::Now()
+{
+  DateTime res = m_RTC.now();
+  return res;
+}
+  
 
 
 /* 
@@ -36,17 +42,10 @@ void TimeManagerClass::Initialize()
 */
 void TimeManagerClass::LogDateTime() const
 {
-  if ( m_RTC_OK == true ) 
-  {
-    DateTime dtNow = m_RTC.now();
-    LOG_MESSAGE(F("Heure RTC     : %02u/%02u/%4u %02u:%02u\n"),
-                (uint8_t) dtNow.day(), (uint8_t) dtNow.month(), (uint16_t) dtNow.year(), 
-                (uint8_t) dtNow.hour(), (uint8_t) dtNow.minute());
-  }
-  time_t sysNow = now();
-  LOG_MESSAGE(F("Heure ARDUINO : %02u/%02u/%4u %02u:%02u\n"),
-              (uint8_t) day(sysNow), (uint8_t) month(sysNow), (uint16_t) year(sysNow), 
-              (uint8_t) hour(sysNow), (uint8_t) minute(sysNow));  
+  DateTime dtNow = m_RTC.now();
+  LOG_MESSAGE(F("Heure RTC : %02u/%02u/%4u %02u:%02u\n"),
+              (uint8_t) dtNow.day(), (uint8_t) dtNow.month(), (uint16_t) dtNow.year(), 
+              (uint8_t) dtNow.hour(), (uint8_t) dtNow.minute());
 }
 
 
@@ -126,15 +125,9 @@ void TimeManagerClass::UpdateTimeFromNTP()
                   (uint8_t) dtNow.day(), (uint8_t) dtNow.month(), (uint16_t) dtNow.year(), 
                   (uint8_t) dtNow.hour(), (uint8_t) dtNow.minute(), secsSince1970);
 
-      if ( m_RTC_OK == true ) 
-      {
-        // Mise à jour de l'horloge RTC
-        m_RTC.adjust(dtNow);
-      }
+      // Mise à jour de l'horloge RTC
+      m_RTC.adjust(dtNow);
 
-      // Mise à jour de l'heure ARDUINO
-      setTime((int) dtNow.hour(), (int) dtNow.minute(), (int) dtNow.second(),
-              (int) dtNow.day(), (int) dtNow.month(), (int) dtNow.year());     
       LogDateTime();
     
       s_lastNTPUpdateTimeMillisec = NTPUpdateRequestTimeInMs;

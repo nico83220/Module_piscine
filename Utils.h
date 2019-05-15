@@ -30,6 +30,11 @@ public:
   static String Float2String(float   value, 
                              uint8_t precision);
 
+  // Conversion entier en string
+  static String Int2String(int    value, 
+                           int8_t charsNumber = -1,
+                           char   padChar     = '0');
+
   // Lire la mémoire RAM disponible
   static int Utils::GetFreeRAM();
 

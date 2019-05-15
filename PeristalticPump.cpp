@@ -14,8 +14,7 @@ PeristalticPump::PeristalticPump(const String&  name,
                                  Relay*         commandRelay,
                                  ContactSensor* flowSensor,
                                  ContactSensor* tankLevelSensor) : 
-  ObjectBase(name),
-  m_commandRelay(commandRelay),
+  Pump(name, commandRelay),
   m_flowSensor(flowSensor),
   m_tankLevelSensor(tankLevelSensor)
 {
@@ -31,9 +30,8 @@ PeristalticPump::~PeristalticPump()
 
 
 /* 
-  Initialisation du relais
+  Initialisation de la pompe
 */
 void PeristalticPump::Initialize()
 {
 }
-

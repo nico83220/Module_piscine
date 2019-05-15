@@ -153,6 +153,21 @@ String Utils::Float2String(float   value,
 
 
 /*
+  Conversion entier en string
+  @param value Valeur à convertir
+  @param charsNumber Nombre de caractères (-1 pour utiliser la longueur normale)
+  @param padChar Caractère de padding à gauche si la longueur demandée est supérieure à la longueur de l'entier
+*/
+/* static */
+String Utils::Int2String(int    value, 
+                         int8_t charsNumber /* = -1 */,
+                         char   padChar     /* = '0' */)
+{
+  
+}
+
+
+/*
   Lire la mémoire RAM disponible
  */
 /* static */
