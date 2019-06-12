@@ -2,8 +2,18 @@
 #include "Utils.h"
 #include "LogConsole.h"
 
-//#include <TimeLib.h>
 #include <NTPClient.h>
+
+
+/*
+  Constructeur
+*/
+TimeManagerClass::TimeManagerClass() :
+  ISerializable("TimeManagerClass"),
+  m_RTC(),
+  m_timezoneOffsetInSecond(0)
+{
+}
 
 
 /*
@@ -14,13 +24,6 @@ void TimeManagerClass::Initialize()
   // Initialisation de l'horloge RTC
   m_RTC.begin();
 
-/*
-  DateTime dtNow = m_RTC.now();
-  setTime((int) dtNow.hour(), (int) dtNow.minute(), (int) dtNow.second(),
-          (int) dtNow.day(), (int) dtNow.month(), (int) dtNow.year());
-*/
-  LogDateTime();
-
   // Décalage horaire de 2 heures par défaut
   m_timezoneOffsetInSecond = 2L * 3600L;
 }
@@ -29,12 +32,28 @@ void TimeManagerClass::Initialize()
 /*
   Lire la date et heure actuelle
 */
-DateTime TimeManagerClass::Now()
+DateTime TimeManagerClass::Now() const
 {
   DateTime res = m_RTC.now();
   return res;
 }
-  
+
+
+char timeBuffer[25];
+
+/*
+  Lire la date et heure actuelle sous forme de texte
+*/
+String TimeManagerClass::NowStr() const
+{
+  DateTime now = m_RTC.now();
+  memset(timeBuffer, 0, 25);
+  sprintf(timeBuffer, "%02d-%02d-%d %02d:%02d:%02d", 
+          now.day(), now.month(), now.year(), now.hour(), now.minute(), now.second());
+  String res(timeBuffer);
+
+  return res;
+}
 
 
 /* 
@@ -140,5 +159,30 @@ void TimeManagerClass::UpdateTimeFromNTP()
   }
 }
 
-  
+
+/*
+  Sérialiser l'objet vers ou depuis l'EEPROM
+*/
+void TimeManagerClass::Serialize(const SerializeMode& serializeMode,
+                                 int&                 EEPROMAddress)
+{
+  // Ecriture
+  if ( serializeMode == SERIALIZE_MODE_WRITE )
+  {
+    EEPROM.updateLong(EEPROMAddress, m_timezoneOffsetInSecond);
+    EEPROMAddress += sizeof(uint32_t);
+  }
+
+  // Lecture
+  else
+  {
+    m_timezoneOffsetInSecond = EEPROM.readLong(EEPROMAddress);
+    EEPROMAddress += sizeof(uint32_t);
+
+    LOG_MESSAGE(F("TimeManagerClass : lecture configuration (m_timezoneOffsetInSecond = %u)"),
+                m_timezoneOffsetInSecond);
+  }
+}
+
+
 TimeManagerClass TimeManager;

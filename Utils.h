@@ -36,10 +36,17 @@ public:
                            char   padChar     = '0');
 
   // Lire la mémoire RAM disponible
-  static int Utils::GetFreeRAM();
+  static int GetFreeRAM();
 
   // Lire une chaine depuis le dictionnaire
   static String GetStringFromDict(int ID);
+
+  // Ecrire une chaine en EEPROM
+  static void UpdateStringInEEPROM(int&          address,
+                                   const String& value);
+
+  // Lire une chaine en EEPROM
+  static String ReadStringInEEPROM(int& address);
 };
 
 

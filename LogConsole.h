@@ -1,7 +1,8 @@
 #ifndef __LOG_CONSOLE_H__
 #define __LOG_CONSOLE_H__
 
-#include <EthernetUdp.h>
+#include <EthernetServer.h>
+#include <EthernetClient.h>
 
 #define  LOG_MESSAGE   LogConsole.LogMessage
 #define  LOG_NEW_LINE  LogConsole.LogMessage(F("\n"));
@@ -19,11 +20,22 @@ class LogConsoleClass
 private:
 
 protected:
-  EthernetUDP  m_logUDPSocket;      // Socket de log UDP
-  IPAddress    m_logUDPSendIP;      // Adresse IP d'émission UDP
-  uint16_t     m_logUDPSendPort;    // Port d'émission UDP
+  EthernetServer*  m_logTCPServer;      // Serveur TCP d'écoute
+  EthernetClient   m_logTCPClient;      // Client TCP de log
+  EthernetUDP*     m_logUDPSocket;      // Socket de log UDP
+  IPAddress        m_logUDPSendIP;      // Adresse IP d'émission UDP
+  uint16_t         m_logUDPSendPort;    // Port d'émission UDP
 
 public:
+  // Constructeur
+  LogConsoleClass();
+
+  // Destructeur
+  virtual ~LogConsoleClass() {}
+
+  // Initialisation
+  void Initialize(uint16_t logTCPListenPort);
+
   // Initialisation
   void Initialize(const IPAddress& logUDPSendIP,
                   uint16_t         logUDPSendPort,
@@ -33,7 +45,7 @@ public:
   void LogMessage(const __FlashStringHelper* format, ...);
 
   // Traiter la réception de commandes
-  void ProcessUDPCommand();
+  void ProcessCommand();
 };
 
 extern LogConsoleClass LogConsole;

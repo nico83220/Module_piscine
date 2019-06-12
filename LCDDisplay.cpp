@@ -94,6 +94,21 @@ DisplayMode::~DisplayMode()
 // ------------------------------------------------------------------------------------------------
 
 
+/*
+  Constructeur
+*/
+LCDDisplayClass::LCDDisplayClass() :
+  m_display(NULL),
+  m_cols(0),
+  m_rows(0),
+  m_currentDisplayMode(0),
+  m_displayModes(),
+  m_lastRefreshTimeInMs(0),
+  m_lastHearbeatRefreshTimeInMs(0)
+{
+}
+
+
 /* 
   Initialiser l'afficheur de type I2C
 */
@@ -242,20 +257,20 @@ void LCDDisplayClass::Loop(uint32_t nowMillisec)
     std::map< uint8_t, DisplayMode* >::iterator it = m_displayModes.find(m_currentDisplayMode);
     if ( it != m_displayModes.end() )
     {
-      DisplayFunction func = it->second->m_displayFunction;
-      unsigned int period  = it->second->m_displayPeriodInMs;
+      DisplayFunction func    = it->second->m_displayFunction;
+      unsigned int periodInMs = it->second->m_displayPeriodInMs;
 
       // Si la période est atteinte
-      if ( nowMillisec >= m_lastRefreshTime + period )
+      if ( nowMillisec >= m_lastRefreshTimeInMs + periodInMs )
       {
         (*func)(false);
 
-        m_lastRefreshTime = nowMillisec;
+        m_lastRefreshTimeInMs = nowMillisec;
       }
     }
       
-    // Affichage d'un signal de vie toutes les secondes
-    if ( nowMillisec >= m_lastHearbeatRefreshTime + 1000L )
+    // Affichage d'un signal de vie toutes les 2 secondes
+    if ( nowMillisec >= m_lastHearbeatRefreshTimeInMs + 2000L )
     {
       static bool s_heartbeat = true;
 
@@ -264,7 +279,7 @@ void LCDDisplayClass::Loop(uint32_t nowMillisec)
 
       s_heartbeat = !s_heartbeat;
 
-      m_lastHearbeatRefreshTime = nowMillisec;
+      m_lastHearbeatRefreshTimeInMs = nowMillisec;
     }
   }
 }

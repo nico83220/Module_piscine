@@ -21,6 +21,7 @@ AnalogSensor::AnalogSensor(const String& name,
                            Sensor*       compensationSensor           /* = NULL */,
                            uint8_t       compensationSensorWhichValue /* = 0 */) :
   Sensor(name, pin, 1),
+  ISerializable(name),
   m_valueName(valueName),
   m_valueUnit(valueUnit),
   m_readsCountPerValue(readsCountPerValue),
@@ -47,7 +48,7 @@ AnalogSensor::~AnalogSensor()
 
 
 /* 
-  Lire la valeur moyenne du votage sur le port analogique du senseur
+  Lire la valeur moyenne du voltage sur le port analogique du senseur
   @return float Valeur moyenne du votage sur le port analogique du senseur
 */
 float AnalogSensor::ReadAverageVoltageValue()
@@ -237,5 +238,43 @@ void AnalogSensor::Update(bool logValue)
                     Utils::Float2String(voltage, 2).c_str());
       }
     }
+  }
+}
+
+
+/*
+  Sérialiser l'objet vers ou depuis l'EEPROM
+*/
+void AnalogSensor::Serialize(const SerializeMode& serializeMode,
+                             int&                 EEPROMAddress)
+{
+  // Ecriture
+  if ( serializeMode == SERIALIZE_MODE_WRITE )
+  {
+    uint8_t boolValue = ( m_calibrated == true ) ? 1 : 0;
+    EEPROM.updateByte(EEPROMAddress, boolValue);
+    EEPROMAddress += sizeof(uint8_t);
+    EEPROM.updateFloat(EEPROMAddress, m_a);
+    EEPROMAddress += sizeof(float);
+    EEPROM.updateFloat(EEPROMAddress, m_b);
+    EEPROMAddress += sizeof(float);
+  }
+
+  // Lecture
+  else
+  {
+    uint8_t boolValue = EEPROM.readByte(EEPROMAddress);
+    m_calibrated = ( boolValue == 1 ) ? true : false;
+    EEPROMAddress += sizeof(uint8_t);
+    m_a = EEPROM.readFloat(EEPROMAddress);
+    EEPROMAddress += sizeof(float);
+    m_b = EEPROM.readFloat(EEPROMAddress);
+    EEPROMAddress += sizeof(float);
+
+    LOG_MESSAGE(F("AnalogSensor %s : lecture configuration (m_calibrated = %s - m_a = %f - m_b = %f)"),
+                m_name.c_str(),
+                ( m_calibrated == true ) ? "true" : "false",
+                m_a,
+                m_b);
   }
 }

@@ -2,22 +2,45 @@
 #include "Utils.h"
 #include "TimeManager.h"
 
-
 #include <TimeLib.h>
 
 
 /*
+  Constructeur
+*/
+LogConsoleClass::LogConsoleClass() :
+  m_logTCPServer(NULL),
+  m_logTCPClient(NULL),
+  m_logUDPSocket(NULL)
+{
+}
+
+
+/*
   Initialisation
-  @param logUDPSendIP Adresse IP d'émission UDP
-  @param logUDPSendPort Port d'émission UDP
-  @param logUDPListenPort Port d'écoute UDP
+  @param logTCPListenPort Port d'écoute pour les connexion TCP
+*/
+void LogConsoleClass::Initialize(uint16_t logTCPListenPort)
+{
+  // On démarre le serveur
+  m_logTCPServer = new EthernetServer(logTCPListenPort);
+  m_logTCPServer->begin();
+
+  // On attend une connexion
+  m_logTCPClient = m_logTCPServer->available();
+}
+
+
+/*
+  Initialisation
 */
 void LogConsoleClass::Initialize(const IPAddress& logUDPSendIP,
                                  uint16_t         logUDPSendPort,
                                  uint16_t         logUDPListenPort)
 {
   // Configuration de la socket UDP de log et communication
-  m_logUDPSocket.begin(logUDPListenPort);
+  m_logUDPSocket = new EthernetUDP();
+  m_logUDPSocket->begin(logUDPListenPort);
 
   m_logUDPSendIP   = logUDPSendIP;
   m_logUDPSendPort = logUDPSendPort;
@@ -46,77 +69,100 @@ void LogConsoleClass::LogMessage(const __FlashStringHelper* format, ...)
 
   Utils::UTF8ToASCII(textBuffer);
 
-  while ( m_logUDPSocket.beginPacket(m_logUDPSendIP, m_logUDPSendPort) == 0 );
+  if ( m_logUDPSocket != NULL )
+  {
+    while ( m_logUDPSocket->beginPacket(m_logUDPSendIP, m_logUDPSendPort) == 0 );
 
-  // Emission UDP
-  size_t len  = strlen(textBuffer);
-  m_logUDPSocket.write(textBuffer, len);
-  m_logUDPSocket.endPacket();
-  
+    // Emission UDP
+    size_t len  = strlen(textBuffer);
+    m_logUDPSocket->write(textBuffer, len);
+    m_logUDPSocket->endPacket();
+  }
+
+  else if ( m_logTCPClient == true )
+  {
+    //size_t len  = strlen(textBuffer);
+    //m_logClient.write(textBuffer, len);
+    m_logTCPClient.print(textBuffer);
+  }
+
   // Ecriture sur la liaison série
   Serial.print(textBuffer);
-
-//  delay(10);
 }
 
 
 // Buffer de réception
-char UDPPackerBuffer[UDP_TX_PACKET_MAX_SIZE];
+#define  PACKET_BUFFER_SIZE  30
+char packerBuffer[PACKET_BUFFER_SIZE];
 
 /*
   Traiter la réception de commandes
 */
-void LogConsoleClass::ProcessUDPCommand()
+void LogConsoleClass::ProcessCommand()
 {
-  // Y a-t-il une donnée sur la socket UDP ?
-  int packetSize = m_logUDPSocket.parsePacket();
-  if ( packetSize > 0 ) 
-  {
-    // Lecture de la donnée sur la socket UDP
-    memset(UDPPackerBuffer, 0, UDP_TX_PACKET_MAX_SIZE);
-    m_logUDPSocket.read(UDPPackerBuffer, UDP_TX_PACKET_MAX_SIZE);
+  uint8_t nbChars = 0;
 
+  if ( m_logUDPSocket != NULL )
+  {
+    // Y a-t-il une donnée sur la socket UDP ?
+    int packetSize = m_logUDPSocket->parsePacket();
+    if ( packetSize > 0 ) 
+    {
+      // Lecture de la donnée sur la socket UDP
+      memset(packerBuffer, 0, PACKET_BUFFER_SIZE);
+      nbChars = m_logUDPSocket->read(packerBuffer, PACKET_BUFFER_SIZE);
+    }
+  }
+
+  else if ( m_logTCPClient == true )
+  {
+    // Y a-t-il une donnée sur la socket client ?
+    if ( m_logTCPClient.available() == true ) 
+    {
+      // Lecture de la donnée sur la socket client
+      memset(packerBuffer, 0, PACKET_BUFFER_SIZE);
+      nbChars = m_logTCPClient.read(packerBuffer, PACKET_BUFFER_SIZE);
+    }
+  }
+
+  if ( nbChars > 0 )
+  {
     // Si c'est la commande de RESET
-    if ( ( strncmp(UDPPackerBuffer, "reset", 5) == 0 ) ||
-         ( strncmp(UDPPackerBuffer, "RESET", 5) == 0 ) )
+    if ( strncmp(packerBuffer, "reset", 5) == 0 )
     {
       LogMessage(F("\nModule_piscine -> SoftwareReset ...\n\n"));
       Utils::SoftwareReset();
     }
 
-    else if ( ( strncmp(UDPPackerBuffer, "ntp", 3) == 0 ) ||
-              ( strncmp(UDPPackerBuffer, "NTP", 3) == 0 ) )
+    else if ( strncmp(packerBuffer, "ntp", 3) == 0 )
     {
       LogMessage(F("\nModule_piscine -> SynchroNTP ...\n\n"));
       TimeManager.UpdateTimeFromNTP();
     }
 
-    else if ( ( strncmp(UDPPackerBuffer, "date", 4) == 0 ) ||
-              ( strncmp(UDPPackerBuffer, "DATE", 4) == 0 ) )
+    else if ( strncmp(packerBuffer, "date", 4) == 0 )
     {
       TimeManager.LogDateTime();
     }
     
-    else if ( ( strncmp(UDPPackerBuffer, "decal1", 6) == 0 ) ||
-              ( strncmp(UDPPackerBuffer, "DECAL1", 6) == 0 ) )
+    else if ( strncmp(packerBuffer, "decal1", 6) == 0 )
     {
       // Décalage horaire d'une heure
-      LOG_MESSAGE(F("Decalage horaire d'une heure\n"));
+      LogMessage(F("Decalage horaire d'une heure\n"));
       TimeManager.SetTimezoneOffsetInSecond(1L * 3600L);
     }
     
-    else if ( ( strncmp(UDPPackerBuffer, "decal2", 6) == 0 ) ||
-              ( strncmp(UDPPackerBuffer, "DECAL2", 6) == 0 ) )
+    else if ( strncmp(packerBuffer, "decal2", 6) == 0 )
     {
       // Décalage horaire d'une heure
-      LOG_MESSAGE(F("Decalage horaire de 2 heures\n"));
+      LogMessage(F("Decalage horaire de 2 heures\n"));
       TimeManager.SetTimezoneOffsetInSecond(2L * 3600L);
     }
     
     else
     {
       LogMessage(F("Module_piscine -> commande '%s' inconnue\n"),
-                 UDPPackerBuffer);
+                packerBuffer);
     }
   }
 }

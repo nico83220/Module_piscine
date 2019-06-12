@@ -2,6 +2,7 @@
 #define __ANALOG_SENSOR_H__
 
 #include "Sensor.h"
+#include "Config.h"
 
 #include <RunningMedian.h>
 
@@ -13,7 +14,8 @@
   Les senseurs analogiques ne gère qu'une valeur
   La calibration consiste en 2 paires de valeurs (voltage, valeur) qui définissent une équation de droite pour la conversion de voltage en valeur
 */
-class AnalogSensor : public Sensor
+class AnalogSensor : public Sensor,
+                     public ISerializable
 {
 private:
 
@@ -80,6 +82,10 @@ public:
 
   // Mise à jour de la valeur du capteur
   virtual void Update(bool logValue);
+
+  // Sérialiser l'objet vers ou depuis l'EEPROM
+  virtual void Serialize(const SerializeMode& serializeMode,
+                         int&                 EEPROMAddress);
 };
 
 #endif  // __ANALOG_SENSOR_H__

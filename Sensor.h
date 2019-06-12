@@ -9,7 +9,7 @@
 
 /*
   @class Sensor
-  @brief Classe abstraite definissant une classe générique de gestion de senseur  
+  @brief Classe abstraite definissant une classe générique de gestion de senseurs
 */
 class Sensor : public ObjectBase
 {

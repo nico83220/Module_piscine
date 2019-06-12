@@ -3,6 +3,8 @@
 #include <avr/wdt.h>
 #include <avr/pgmspace.h>
 
+#include <EEPROMex.h>
+
 
 /*
   Effectuer un RESET logiciel
@@ -197,5 +199,45 @@ String Utils::GetStringFromDict(int ID)
   strcpy_P(RAMBuffer, (char*) pgm_read_word(&(DICT[ID])));
   res = String(RAMBuffer);
   
+  return res;
+}
+
+
+/*
+  Ecrire une chaine en EEPROM
+*/
+/* static */
+void Utils::UpdateStringInEEPROM(int&          address,
+                                 const String& value)
+{
+  uint8_t     len = value.length();
+  const char* str = value.c_str();
+  EEPROM.updateByte(address, len);
+  address += sizeof(uint8_t);
+  for ( uint8_t i=0; i<len; ++i )
+  {
+    EEPROM.updateByte(address, str[i]);
+    address += sizeof(uint8_t);
+  }
+}
+
+
+/*
+  Lire une chaine en EEPROM
+*/
+/* static */
+String Utils::ReadStringInEEPROM(int& address)
+{
+  uint8_t len = EEPROM.readByte(address);
+  address += sizeof(uint8_t);
+  char* str = new char[len + 1];
+  memset(str, 0, len + 1);
+  for ( uint8_t i=0; i<len; ++i )
+  {
+    str[i] = EEPROM.readByte(address);
+    address += sizeof(uint8_t);
+  }
+
+  String res(str);
   return res;
 }

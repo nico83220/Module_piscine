@@ -3,9 +3,6 @@
 
 #include "ObjectBase.h"
 
-#include <ArduinoSTL.h>
-#include <vector>
-
 
 /*
   @enum RelayState
@@ -28,9 +25,6 @@ private:
 
 protected:
   uint8_t     m_pin;                       // Pin sur laquelle est connecté le relais
-  RelayState  m_state;                     // Etat du relais
-
-  static std::vector< Relay* >  m_relays;  // Liste des relais du système
 
 public:
   // Constructeur
@@ -44,21 +38,16 @@ public:
   void Initialize();
 
   // Lire l'état du relais
-  RelayState GetState() const
-    { return m_state; }
+  RelayState GetState() const;
 
   // Changer l'état du relais
   void SetState(const RelayState& state);
 
-  // Initialiser tous les relais
-  static void InitializeAllRelays();
+  // Ouvrir le relais
+  void Open();
 
-  // Lire l'état d'un relais
-  static RelayState GetState(const String& name);
-
-  // Changer l'état d'un relais
-  static void SetState(const String& name,
-                       const RelayState& state);
+  // Fermer le relais
+  void Close();
 };
 
 #endif  // __RELAY_H__

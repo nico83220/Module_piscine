@@ -2,9 +2,11 @@
 #include "LogConsole.h"
 #include "Utils.h"
 
+using namespace std;
+
 
 /* static */
-std::vector< Sensor* >  Sensor::m_sensors;
+vector< Sensor* >  Sensor::m_sensors;
 
 
 /* 
@@ -64,7 +66,7 @@ float Sensor::GetValue(uint8_t whichValue /* = 0 */) const
 /* static */
 void Sensor::InitializeAllSensors()
 {
-  std::vector< Sensor* >::iterator it;
+  vector< Sensor* >::iterator it;
   for ( it=m_sensors.begin(); it!=m_sensors.end(); ++it )
   {
     LOG_MESSAGE(F("%s ...\n"), (*it)->m_name.c_str());
@@ -85,7 +87,7 @@ void Sensor::UpdateAllSensors(bool logValue)
     LOG_MESSAGE(F("\nMise a jour des capteurs\n"));
   }
 
-  std::vector< Sensor* >::iterator it;
+  vector< Sensor* >::iterator it;
   for ( it=m_sensors.begin(); it!=m_sensors.end(); ++it )
   {
     (*it)->Update(logValue);
@@ -104,7 +106,7 @@ float Sensor::GetValue(const String& name,
 {
   float res = 0.0;
   
-  std::vector< Sensor* >::iterator it;
+  vector< Sensor* >::iterator it;
   for ( it=m_sensors.begin(); it!=m_sensors.end(); ++it )
   {
     res = (*it)->GetValue(whichValue);

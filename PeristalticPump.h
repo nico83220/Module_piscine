@@ -16,21 +16,22 @@ private:
 
 protected:
   ContactSensor*  m_flowSensor;                  // Capteur de débit de circulation
-  ContactSensor*  m_tankLevelSensor;             // Capteur de niveau du réservoir de produit
 
 public:
   // Constructeur
-  PeristalticPump(const String&  name,
-                  Relay*         commandRelay,
-                  ContactSensor* flowSensor,
-                  ContactSensor* tankLevelSensor);
+  PeristalticPump(const String&      name,
+                  Relay*             commandRelay,
+                  LiquidLevelSensor* liquidLevelSensor,
+                  ContactSensor*     flowSensor);
 
   // Destructeur
   virtual ~PeristalticPump();
 
-  // Initialisation de la pompe
-  void Initialize();
+  // Démarrer la pompe
+  virtual void Start(uint32_t requestedRunningTimeInMs);
 
+  // Boucle de traitement à appeler dans le programme principal
+  virtual void Loop(uint32_t nowMillisec);
 };
 
 #endif  // __PERISTALTIC_PUMP_H__

@@ -20,6 +20,7 @@ protected:
   OneWire            m_oneWireSensor;
   DallasTemperature  m_temperatureSensor;
   uint8_t            m_temperatureSensorAddress[8];
+  String             m_temperatureSensorAddressStr;
   YASM               m_stateMachine;
   
   // Senseur courant pour les méthodes statiques de gestion d'état
@@ -48,6 +49,10 @@ public:
   // Lire la température
   float GetTemperature() const
     { return GetValue(0); }
+
+  // Lire l'adresse sous forme de chaine
+  String GetTemperatureSensorAddress() const
+    { return m_temperatureSensorAddressStr; }
 
   // Mise à jour de la valeur du capteur
   virtual void Update(bool logValue);

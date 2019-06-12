@@ -70,12 +70,18 @@ protected:
   std::map< uint8_t, DisplayMode* >  m_displayModes;
 
   // Heure de dernière mise à jour de l'affichage
-  uint32_t m_lastRefreshTime;
+  uint32_t m_lastRefreshTimeInMs;
 
   // Heure de dernière mise à jour de lu heartbeat
-  uint32_t m_lastHearbeatRefreshTime;
+  uint32_t m_lastHearbeatRefreshTimeInMs;
 
 public:
+  // Constructeur
+  LCDDisplayClass();
+
+  // Destructeur
+  virtual ~LCDDisplayClass() {}
+
   // Initialiser l'afficheur de type I2C
   void Initialize(uint8_t address,
                   uint8_t cols,

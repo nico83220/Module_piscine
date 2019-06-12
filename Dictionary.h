@@ -33,6 +33,12 @@ enum
   POOL_PUMP_1,
   POOL_PUMP_2,
 
+  // Electrovannes
+  POOL_FILLING_VALVE,
+
+  // Lumières
+  POOL_LIGHT,
+
   // Autres
   FIRMWARE_VERSION,
   MQTT_CLIENT,
@@ -92,38 +98,42 @@ const char PROGMEM DICT_18[] = "POMPE_CHLORE";
 const char PROGMEM DICT_19[] = "POMPE_PISCINE_1";
 const char PROGMEM DICT_20[] = "POMPE_PISCINE_2";
 
-const char PROGMEM DICT_21[] = "1.3";
-const char PROGMEM DICT_22[] = "ARDUINO_PISCINE";
-const char PROGMEM DICT_23[] = "OUVERT";
-const char PROGMEM DICT_24[] = "FERME";
-const char PROGMEM DICT_25[] = "pH";
-const char PROGMEM DICT_26[] = "";
-const char PROGMEM DICT_27[] = "ORP";
-const char PROGMEM DICT_28[] = "mV";
-const char PROGMEM DICT_29[] = "pression";
-const char PROGMEM DICT_30[] = "bar";
-const char PROGMEM DICT_31[] = "_MAX";
-const char PROGMEM DICT_32[] = "_HAUT";
-const char PROGMEM DICT_33[] = "_BAS";
-const char PROGMEM DICT_34[] = "_MIN";
-const char PROGMEM DICT_35[] = "MAX";
-const char PROGMEM DICT_36[] = "HAUT";
-const char PROGMEM DICT_37[] = "OK";
-const char PROGMEM DICT_38[] = "BAS";
-const char PROGMEM DICT_39[] = "MIN";
-const char PROGMEM DICT_40[] = "192.168.10.1";
-const char PROGMEM DICT_41[] = "/ALIVE";
-const char PROGMEM DICT_42[] = "Hello World !";
-const char PROGMEM DICT_43[] = "/";
-const char PROGMEM DICT_44[] = "//";
-const char PROGMEM DICT_45[] = "TEMPERATURE_EAU";
-const char PROGMEM DICT_46[] = "TEMPERATURE_AIR";
-const char PROGMEM DICT_47[] = "HUMIDITE_AIR";
-const char PROGMEM DICT_48[] = "PH";
-const char PROGMEM DICT_49[] = "ORP";
-const char PROGMEM DICT_50[] = "PRESSION_FILTRE";
-const char PROGMEM DICT_51[] = "ON";
-const char PROGMEM DICT_52[] = "OFF";
+const char PROGMEM DICT_21[] = "VANNE_REMPLISSAGE_PISCINE";
+
+const char PROGMEM DICT_22[] = "LUMIERE_PISCINE";
+
+const char PROGMEM DICT_23[] = "1.3";
+const char PROGMEM DICT_24[] = "ARDUINO_PISCINE";
+const char PROGMEM DICT_25[] = "OUVERT";
+const char PROGMEM DICT_26[] = "FERME";
+const char PROGMEM DICT_27[] = "pH";
+const char PROGMEM DICT_28[] = "";
+const char PROGMEM DICT_29[] = "ORP";
+const char PROGMEM DICT_30[] = "mV";
+const char PROGMEM DICT_31[] = "pression";
+const char PROGMEM DICT_32[] = "bar";
+const char PROGMEM DICT_33[] = "_MAX";
+const char PROGMEM DICT_34[] = "_HAUT";
+const char PROGMEM DICT_35[] = "_BAS";
+const char PROGMEM DICT_36[] = "_MIN";
+const char PROGMEM DICT_37[] = "MAX";
+const char PROGMEM DICT_38[] = "HAUT";
+const char PROGMEM DICT_39[] = "OK";
+const char PROGMEM DICT_40[] = "BAS";
+const char PROGMEM DICT_41[] = "MIN";
+const char PROGMEM DICT_42[] = "192.168.10.1";
+const char PROGMEM DICT_43[] = "/ALIVE";
+const char PROGMEM DICT_44[] = "Hello World !";
+const char PROGMEM DICT_45[] = "/";
+const char PROGMEM DICT_46[] = "//";
+const char PROGMEM DICT_47[] = "TEMPERATURE_EAU";
+const char PROGMEM DICT_48[] = "TEMPERATURE_AIR";
+const char PROGMEM DICT_49[] = "HUMIDITE_AIR";
+const char PROGMEM DICT_50[] = "PH";
+const char PROGMEM DICT_51[] = "ORP";
+const char PROGMEM DICT_52[] = "PRESSION_FILTRE";
+const char PROGMEM DICT_53[] = "ON";
+const char PROGMEM DICT_54[] = "OFF";
 
 
 const char* const PROGMEM DICT[] = 
@@ -181,6 +191,8 @@ const char* const PROGMEM DICT[] =
   DICT_50,
   DICT_51,
   DICT_52,
+  DICT_53,
+  DICT_54,
 };
 
 

@@ -4,10 +4,6 @@
 #include <Arduino.h>
 
 
-/* static */
-std::vector< Relay* >  Relay::m_relays;
-
-
 /* 
   Constructeur
   @param name Nom du capteur
@@ -16,10 +12,8 @@ std::vector< Relay* >  Relay::m_relays;
 Relay::Relay(const String& name,
              uint8_t       pin) :
   ObjectBase(name),
-  m_pin(pin),
-  m_state(RELAY_OPENED)
+  m_pin(pin)
 {
-  Relay::m_relays.push_back(this);
 }
 
 
@@ -37,11 +31,29 @@ Relay::~Relay()
 void Relay::Initialize()
 {
   pinMode(m_pin, OUTPUT);  
+
+  // Etat ouvert
   digitalWrite(m_pin, HIGH);
 
   LOG_MESSAGE(F("Initialisation du relais %s sur la broche %d OK\n"),
               m_name.c_str(),
               m_pin);
+}
+
+
+/*
+  Lire l'état du relais
+*/
+RelayState Relay::GetState() const
+{
+  RelayState res = RELAY_OPENED;
+
+  if ( digitalRead(m_pin) == LOW )
+  {
+    res = RELAY_CLOSED;
+  }
+
+  return res;
 }
 
 
@@ -51,75 +63,31 @@ void Relay::Initialize()
 */
 void Relay::SetState(const RelayState& state)
 {
-  m_state = state;
-
-  if ( m_state == RELAY_OPENED )
+  if ( state == RELAY_OPENED )
   {
-    digitalWrite(m_pin, HIGH);  
+    Open();
   }
   
-  else if ( m_state == RELAY_CLOSED )
+  else if ( state == RELAY_CLOSED )
   {
-    digitalWrite(m_pin, LOW);  
-  }
-}
-
-
-/* 
-  Initialiser tous les relais
-*/
-/* static */
-void Relay::InitializeAllRelays()
-{
-  std::vector< Relay* >::iterator it;
-  for ( it=m_relays.begin(); it!=m_relays.end(); ++it )
-  {
-    LOG_MESSAGE(F("%s ...\n"), (*it)->m_name.c_str());
-    (*it)->Initialize();
+    Close();
   }
 }
 
 
 /*
-  Lire l'état d'un relais
-  @param name Nom du relais
-  @return RelayState Etat trouvé
+  Ouvrir le relais
 */
-/* static */
-RelayState Relay::GetState(const String& name)
+void Relay::Open()
 {
-  RelayState res = RELAY_OPENED;
-  
-  std::vector< Relay* >::iterator it;
-  for ( it=m_relays.begin(); it!=m_relays.end(); ++it )
-  {
-    if ( (*it)->m_name == name )
-    {
-      res = (*it)->GetState();
-      break;
-    }
-  }
-
-  return res;
+  digitalWrite(m_pin, HIGH);
 }
 
 
-/* 
-  Changer l'état d'un relais
-  @param name Nom du relais
-  @param state Nouvel état
+/*
+  Fermer le relais
 */
-/* static */
-void Relay::SetState(const String&     name,
-                     const RelayState& state)
+void Relay::Close()
 {
-  std::vector< Relay* >::iterator it;
-  for ( it=m_relays.begin(); it!=m_relays.end(); ++it )
-  {
-    if ( (*it)->m_name == name )
-    {
-      (*it)->SetState(state);
-      break;
-    }
-  }
+  digitalWrite(m_pin, LOW);
 }

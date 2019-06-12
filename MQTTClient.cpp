@@ -3,6 +3,21 @@
 #include "Utils.h"
 
 
+/*
+  Constructeur
+*/
+MQTTClientClass::MQTTClientClass() :
+  m_MQTTClientName(),
+  m_ethernetClient(),
+  m_MQTTClient(),
+  m_connectionPeriodInMs(0),
+  m_lastConnectionTryTimeInMs(0),
+  m_lastLoopTimeInMs(0),
+  m_subscription()
+{
+}
+
+
 /* 
   Initialiser le client MQTT
   @param MQTTClientName Nom du client MQTT
@@ -91,16 +106,16 @@ void MQTTClientClass::Loop(uint32_t nowMillisec)
   if ( m_MQTTClient.connected() == false )
   {
     // Si la période d'essai est atteinte
-    if ( nowMillisec >= m_lastConnectionTryTime + m_connectionPeriodInMs )
+    if ( nowMillisec >= m_lastConnectionTryTimeInMs + m_connectionPeriodInMs )
     {
       // On mémorise l'heure de l'essai de connexion
-      m_lastConnectionTryTime = nowMillisec;
+      m_lastConnectionTryTimeInMs = nowMillisec;
       
       // On essaie de se connecter
       if ( TryToConnect() == true )
       {
         // Si on a réussi, on raz l'heure de dernier essai
-        m_lastConnectionTryTime = 0;
+        m_lastConnectionTryTimeInMs = 0;
       }
     }
   }

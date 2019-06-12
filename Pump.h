@@ -1,43 +1,37 @@
 #ifndef __PUMP_H__
 #define __PUMP_H__
 
-#include "ObjectBase.h"
+#include "Actuator.h"
 
-class Relay;
+class LiquidLevelSensor;
 
 
 /*
   @class Pump
   @brief Classe de gestion de pompes  
 */
-class Pump : public ObjectBase
+class Pump : public Actuator
 {
 private:
 
 protected:
-  Relay*   m_commandRelay;                // Relais de commande la pompe
-  bool     m_running;                     // Flag indiquant si la pompe est en route
+  Relay*              m_commandRelay;                // Relais de commande de la pompe
+  LiquidLevelSensor*  m_liquidLevelSensor;           // Capteur de niveau de liquide à pomper
 
 public:
   // Constructeur
-  Pump(const String&  name,
-       Relay*         commandRelay);
+  Pump(const String&      name,
+       Relay*             commandRelay,
+       LiquidLevelSensor* liquidLevelSensor);
 
   // Destructeur
   virtual ~Pump();
 
-  // Initialisation de la pompe
-  void Initialize();
-
   // Démarrer la pompe
-  void Start();
+  virtual void Start(uint32_t requestedRunningTimeInMs);
 
-  // Arrêter la pompe
-  void Stop();
-
-  // Lire si la pompe est en route
-  bool IsRunning() const
-    { return m_running; }
+  // Boucle de traitement à appeler dans le programme principal
+  virtual void Loop(uint32_t nowMillisec);
 };
 
 #endif  // __PUMP_H__

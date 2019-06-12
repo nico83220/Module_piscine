@@ -102,7 +102,16 @@ void OneWireDallasTemperatureSensor::Initialize()
   if ( m_temperatureSensor.getDS18Count() > 0 )
   {
     m_temperatureSensor.getAddress(m_temperatureSensorAddress, 0);
-      
+
+    char buffer[25];
+    memset(buffer, 0, 25);
+    sprintf(buffer, "%02u-%02u-%02u-%02u-%02u-%02u-%02u-%02u", 
+                    m_temperatureSensorAddress[0], m_temperatureSensorAddress[1], 
+                    m_temperatureSensorAddress[2], m_temperatureSensorAddress[3], 
+                    m_temperatureSensorAddress[4], m_temperatureSensorAddress[5],
+                    m_temperatureSensorAddress[6], m_temperatureSensorAddress[7]);
+    m_temperatureSensorAddressStr = String(buffer);
+
     // Changer la résolution de la lecture de température
     m_temperatureSensor.setResolution(m_temperatureSensorAddress, TEMPERATURE_RESOLUTION);
 

@@ -34,8 +34,10 @@ ContactSensor::~ContactSensor()
 void ContactSensor::Initialize()
 {
   // On met la sortie à un état haut
-  pinMode(m_pin, OUTPUT);  
-  digitalWrite(m_pin, HIGH);  
+  pinMode(m_pin, OUTPUT);
+  digitalWrite(m_pin, HIGH);
+
+  pinMode(m_pin, INPUT_PULLUP);  
 
   LOG_MESSAGE(F("Initialisation du capteur de contact %s sur les broches %d %d OK\n"),
               m_name.c_str(),

@@ -22,18 +22,24 @@ class MQTTClientClass
 private:
 
 protected:
-  String                 m_MQTTClientName;         // Nom du client MQTT
-  EthernetClient         m_ethernetClient;         // Client ethernet pour le client MQTT
-  PubSubClient           m_MQTTClient;             // Client MQTT
+  String                 m_MQTTClientName;             // Nom du client MQTT
+  EthernetClient         m_ethernetClient;             // Client ethernet pour le client MQTT
+  PubSubClient           m_MQTTClient;                 // Client MQTT
   
-  uint32_t               m_connectionPeriodInMs;   // Période de connexion
-  uint32_t               m_lastConnectionTryTime;  // Heure de dernière temptative de connexion
+  uint32_t               m_connectionPeriodInMs;       // Période de connexion
+  uint32_t               m_lastConnectionTryTimeInMs;  // Heure de dernière temptative de connexion
   
-  uint32_t               m_lastLoopTime;           // Heure de dernier traitement
+  uint32_t               m_lastLoopTimeInMs;           // Heure de dernier traitement
 
-  std::vector< String >  m_subscription;           // Liste de souscriptions
+  std::vector< String >  m_subscription;               // Liste de souscriptions
 
 public:
+  // Constructeur
+  MQTTClientClass();
+
+  // Destructeur
+  virtual ~MQTTClientClass() {}
+
   // Initialiser le client MQTT
   void Initialize(const String&    MQTTClientName,
                   const IPAddress& MQTTServerIP,
